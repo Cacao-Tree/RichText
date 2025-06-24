@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rich Text Editor</title>
+    <style>
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        background-color: #000;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      #editor {
+        width: 640px;
+        max-width: 100%;
+        height: 360px;
+        border: 1px solid #ccc;
+        padding: 10px;
+        font-size: 16px;
+        border-radius: 12px;
+        color: #fff;
+        caret-color: #723fff;
+      }
+      .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        width: 100%;
+        height: 100%;
+        padding: 16px;
+      }
+      .btn-area {
+        padding: 24px 16px;
+      }
+      .btn-feature {
+        background-color: #723fff;
+        color: #fff;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div id="editor" contenteditable="true"></div>
+      <div class="btn-area">
+        <button class="btn-feature" onclick="handleGetSelecttion()">
+          获取选区
+        </button>
+        <button class="btn-feature" onclick="handleInsertImage()">
+          插入图片节点
+        </button>
+        <button class="btn-feature" onclick="handleInsertSpan()">
+          插入span
+        </button>
+        <button class="btn-feature" onclick="handleInsert()">插入😊</button>
+      </div>
+    </div>
+    <script>
+      function checkSelection() {
+        const editor = document.getElementById('editor');
+        if (editor) {
+          editor.focus(); // 确保编辑器获得焦点
+          const range = document.createRange();
+          range.selectNodeContents(editor);
+          range.collapse(false); // 折叠到内容的末尾
+
+          // 获取 Selection 对象并设置新的 Range
+          const selection = window.getSelection();
+          selection.removeAllRanges(); // 清除之前的选区
+          selection.addRange(range); // 设置新的选区
+          return true; // 返回 true 表示编辑器存在
+        }
+        return false;
+      }
+      function handleInsert() {
+        if (!checkSelection()) {
+          console.log('编辑器不存在或未获得焦点，无法插入内容。');
+          return;
+        }
+        window.getSelection().deleteFromDocument();
+        const selection = window.getSelection();
+        if (selection.rangeCount > 0) {
+          const range = selection.getRangeAt(0);
+          const textNode = document.createTextNode('😊');
+          range.insertNode(textNode);
+          // 将光标移动到插入的表情符号后面
+          range.setStartAfter(textNode);
+          range.collapse(true);
+          selection.removeAllRanges(); // 清除之前的选区
+          selection.addRange(range); // 设置新的选区
+        } else {
+          console.log('No selection found to insert text.');
+        }
+      }
+      function handleInsertImage() {
+        if (!checkSelection()) {
+          console.log('编辑器不存在或未获得焦点，无法插入内容。');
+          return;
+        }
+        const selection = window.getSelection();
+        if (selection.rangeCount > 0) {
+          const range = selection.getRangeAt(0);
+          const imgNode = document.createElement('img');
+          imgNode.src = 'https://via.placeholder.com/150'; // 图片的 URL
+          imgNode.alt = '插入的图片'; // 图片的描述
+          imgNode.style.width = '50px'; // 设置图片宽度
+          imgNode.style.height = '50px'; // 设置图片高度
+          range.insertNode(imgNode); // 插入图片节点
+          // 将光标移动到图片之后
+          range.setStartAfter(imgNode);
+          range.collapse(true);
+          selection.removeAllRanges();
+          selection.addRange(range);
+        } else {
+          console.log('No selection found.');
+        }
+      }
+      function handleInsertSpan() {
+        if (!checkSelection()) {
+          console.log('编辑器不存在或未获得焦点，无法插入内容。');
+          return;
+        }
+        const selection = window.getSelection();
+        if (selection.rangeCount > 0) {
+          const range = selection.getRangeAt(0);
+          const spanNode = document.createElement('span');
+          spanNode.textContent = '插入的内容'; // 设置 `span` 的文本内容
+          spanNode.style.color = '#723fff'; // 设置样式
+          spanNode.style.fontWeight = 'bold';
+          range.insertNode(spanNode); // 插入 `span` 节点
+          // 将光标移动到 `span` 之后
+          range.setStartAfter(spanNode);
+          range.collapse(true);
+          selection.removeAllRanges();
+          selection.addRange(range);
+        } else {
+          console.log('No selection found.');
+        }
+      }
+      function handleGetSelecttion() {
+        if (!checkSelection()) {
+          console.log('编辑器不存在或未获得焦点，无法获取选区。');
+          return;
+        }
+        console.log('获取选区按钮被点击了');
+        const selection = window.getSelection();
+        if (selection.rangeCount > 0) {
+          const range = selection.getRangeAt(0);
+          const startContainer = range.startContainer;
+          const endContainer = range.endContainer;
+          const startOffset = range.startOffset;
+          const endOffset = range.endOffset;
+          const anchorNode = selection.anchorNode;
+          const focusNode = selection.focusNode;
+          const anchorOffset = selection.anchorOffset;
+          const focusOffset = selection.focusOffset;
+          const type = selection.type;
+
+          console.log('Selection Type:', type);
+          console.log('Anchor Node:', anchorNode);
+          console.log('Focus Node:', focusNode);
+          console.log('Anchor Offset:', anchorOffset);
+          console.log('Focus Offset:', focusOffset);
+          console.log('Start Container:', startContainer);
+          console.log('End Container:', endContainer);
+          console.log('Start Offset:', startOffset);
+          console.log('End Offset:', endOffset);
+        } else {
+          console.log('No selection found.');
+        }
+      }
+    </script>
+  </body>
+</html>
