@@ -45,7 +45,7 @@ function cleanup(effectFn) {
   effectFn.deps.length = 0;
 }
 
-function track(target, key) {
+export function track(target, key) {
   let depsMap = bucket.get(target); // 这个代理对象的副作用依赖
   if (!depsMap) {
     bucket.set(target, (depsMap = new Map())); // 没有就塞一个
@@ -58,10 +58,10 @@ function track(target, key) {
 
   dep.add(activeEffect);
 
-  activeEffect.deps.push(dep); // 将与当前副作用函数相关的依赖集合收集起来
+  activeEffect?.deps?.push(dep); // 将与当前副作用函数相关的依赖集合收集起来
 }
 
-function trigger(target, key) {
+export function trigger(target, key) {
   const depsMap = bucket.get(target);
   const dep = depsMap?.get(key);
 
