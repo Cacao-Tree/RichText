@@ -20,10 +20,16 @@ function watch(source, callback, options = {}) {
   }
 
   let oldValue, newValue;
+  let cleanup;
+
+  function onInvalidate(fn) {
+    cleanup = fn;
+  }
 
   const job = () => {
     newValue = effectFn();
-    callback(oldValue, newValue);
+    cleanup?.(); // 如果有的话就得执行，可以清除遗留副作用函数，这个需要和使用的地方去配合，例如执行之后把某个值改为false，然后不去取值或者return掉
+    callback(oldValue, newValue, onInvalidate);
     oldValue = newValue;
   };
   const effectFn = effect(getter, {
